@@ -9,8 +9,8 @@
  */
 function onOpen() {
   var ui = SpreadsheetApp.getUi();
-  ui.createMenu('Office Tools')
-    .addItem('Autofit Columns', 'autofitColumns')
-    .addItem('Format Header (Blue)', 'formatHeaderBlue')
+  ui.createMenu('🧰 Office Tools')
+    .addItem('📏 Autofit Columns', 'autofitColumns')
+    .addItem('🎨 Format Header (Blue)', 'formatHeaderBlue')
     .addToUi();
 }
