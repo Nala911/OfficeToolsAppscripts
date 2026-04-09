@@ -1,0 +1,8 @@
+# Dependency directories
+node_modules/
+
+# Optional: Ignore clasp credentials if they are stored in the root
+.clasp.json
+# Wait, usually scriptId is fine to keep in .clasp.json. 
+# But let's check BeaverAppscripts/.clasp.json - it was visible in session context.
+# So I will keep it.
