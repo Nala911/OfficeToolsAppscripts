@@ -11,7 +11,6 @@ function onOpen() {
   var ui = SpreadsheetApp.getUi();
   ui.createMenu('🧰 Office Tools')
     .addItem('📏 Autofit Columns', 'autofitColumns')
-    .addItem('🎨 Format Header (Blue)', 'formatHeaderBlue')
     .addItem('💰 Deduct Amounts', 'deductAmountsFromColumnF')
     .addItem('📋 Export Departments to PDF', 'showDeptSelector')
     .addToUi();

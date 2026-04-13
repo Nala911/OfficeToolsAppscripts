@@ -12,14 +12,43 @@ function showDeptSelector() {
     const data = sheet.getRange(2, 4, lastRow - 1, 1).getValues();
     const uniqueDepts = [...new Set(data.flat())].filter(String).sort();
 
-    const htmlTemplate = HtmlService.createTemplateFromFile('DownloadDialog');
-    htmlTemplate.departments = uniqueDepts;
+    const ui = SpreadsheetApp.getUi();
+    const response = ui.prompt(
+      'Filter and Export to PDF',
+      'Available Departments:\n' + uniqueDepts.join(', ') + 
+      '\n\nEnter departments to export (comma-separated) or leave blank to export all:',
+      ui.ButtonSet.OK_CANCEL
+    );
+
+    if (response.getSelectedButton() !== ui.Button.OK) {
+      return;
+    }
+
+    let selectedDepts = [];
+    const input = response.getResponseText().trim();
     
-    const html = htmlTemplate.evaluate()
-      .setWidth(400)
-      .setHeight(450);
-      
-    SpreadsheetApp.getUi().showModalDialog(html, 'Select Departments');
+    if (input === '') {
+      selectedDepts = uniqueDepts;
+    } else {
+      selectedDepts = input.split(',').map(d => d.trim()).filter(String);
+      const invalid = selectedDepts.filter(d => !uniqueDepts.includes(d));
+      if (invalid.length > 0) {
+        ui.alert('Invalid departments entered: ' + invalid.join(', '));
+        return;
+      }
+    }
+
+    // Give some immediate feedback that it's running
+    SpreadsheetApp.getActiveSpreadsheet().toast('Processing PDF export...', 'Please Wait', 5);
+
+    const result = processSelection(selectedDepts);
+    
+    if (result.success) {
+      ui.alert('Export Successful', `Saved to Drive File:\n${result.fileName}\n\nURL:\n${result.url}`, ui.ButtonSet.OK);
+    } else {
+      ui.alert('Export Failed', "Error: " + result.error, ui.ButtonSet.OK);
+    }
+
   } catch (e) {
     SpreadsheetApp.getUi().alert("Error loading departments: " + e.message);
   }
@@ -45,12 +74,15 @@ function processSelection(selectedDepts) {
     const range = sheet.getDataRange();
     filter = range.createFilter();
     
-    const criteria = SpreadsheetApp.newFilterCriteria()
-      .setHiddenValues(hiddenDepts) // This is the fix
-      .build();
+    if (hiddenDepts.length > 0) {
+      const criteria = SpreadsheetApp.newFilterCriteria()
+        .setHiddenValues(hiddenDepts)
+        .build();
+      filter.setColumnFilterCriteria(4, criteria); 
+    }
     
-    filter.setColumnFilterCriteria(4, criteria); 
     SpreadsheetApp.flush(); 
+    Utilities.sleep(1000); // Allow time for filter UI update for PDF engine to catch up
 
     // 3. Construct Export URL
     const ssId = ss.getId();
@@ -66,16 +98,19 @@ function processSelection(selectedDepts) {
     });
 
     if (response.getResponseCode() !== 200) {
-      throw new Error("PDF Engine Error: " + response.getResponseCode());
+      throw new Error("PDF Engine Error: " + response.getContentText());
     }
 
-    const blob = response.getBlob();
+    // Save directly to Drive instead of returning base64
+    const blob = response.getBlob().setName("Export_" + new Date().getTime() + ".pdf");
+    const file = DriveApp.createFile(blob);
+
     sheet.getFilter().remove(); // Cleanup
 
     return {
       success: true,
-      bytes: Utilities.base64Encode(blob.getBytes()),
-      fileName: "Export_" + new Date().getTime() + ".pdf"
+      fileName: file.getName(),
+      url: file.getUrl()
     };
 
   } catch (e) {
