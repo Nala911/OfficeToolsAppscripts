@@ -39,12 +39,27 @@ function showDeptSelector() {
     }
 
     // Give some immediate feedback that it's running
-    SpreadsheetApp.getActiveSpreadsheet().toast('Processing PDF export...', 'Please Wait', 5);
+    SpreadsheetApp.getActiveSpreadsheet().toast('Processing PDF export...', 'Please Wait', 8);
 
     const result = processSelection(selectedDepts);
     
     if (result.success) {
-      ui.alert('Export Successful', `Saved to Drive File:\n${result.fileName}\n\nURL:\n${result.url}`, ui.ButtonSet.OK);
+      // Use a minimal inline HTML just to trigger the local download and instantly close.
+      const htmlOutput = HtmlService.createHtmlOutput(`
+        <div style="font-family: sans-serif; text-align: center; padding: 20px;">
+          Downloading file... You can close this window.
+        </div>
+        <script>
+          const link = document.createElement('a');
+          link.href = 'data:application/pdf;base64,${result.bytes}';
+          link.download = '${result.fileName}';
+          document.body.appendChild(link);
+          link.click();
+          setTimeout(() => google.script.host.close(), 1500);
+        </script>
+      `).setWidth(350).setHeight(100);
+      
+      ui.showModalDialog(htmlOutput, 'Export Successful');
     } else {
       ui.alert('Export Failed', "Error: " + result.error, ui.ButtonSet.OK);
     }
@@ -101,16 +116,13 @@ function processSelection(selectedDepts) {
       throw new Error("PDF Engine Error: " + response.getContentText());
     }
 
-    // Save directly to Drive instead of returning base64
-    const blob = response.getBlob().setName("Export_" + new Date().getTime() + ".pdf");
-    const file = DriveApp.createFile(blob);
-
+    const blob = response.getBlob();
     sheet.getFilter().remove(); // Cleanup
 
     return {
       success: true,
-      fileName: file.getName(),
-      url: file.getUrl()
+      bytes: Utilities.base64Encode(blob.getBytes()),
+      fileName: "Export_" + new Date().getTime() + ".pdf"
     };
 
   } catch (e) {
