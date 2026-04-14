@@ -1,22 +1,30 @@
 /**
  * @file UI.js
- * @description Creates custom menus on document load.
+ * @description Dynamically creates custom menus based on user roles and configuration.
  */
 
 /**
  * Triggered automatically when the spreadsheet is opened.
- * Adds custom menus to the UI.
+ * Dynamically builds menus for the authorized role.
  */
 function onOpen() {
-  var ui = SpreadsheetApp.getUi();
-  
-  // Office Tools Menu
-  ui.createMenu('🧰 Office Tools')
-    .addItem('🚀 Open Sidebar', 'showSidebar')
-    .addToUi();
+  const ui = SpreadsheetApp.getUi();
+  const role = getCurrentUserRole();
 
-  // Formatting Tools Menu
-  ui.createMenu('✨ Formatting tools')
-    .addItem('📏 Autofit Columns', 'autofitColumns')
-    .addToUi();
+  APP_CONFIG.MENU_CONFIG.forEach(menu => {
+    // Check if at least one item in the menu is authorized for the user
+    const authorizedItems = menu.items.filter(item => 
+      item.roles.includes(role) || item.roles.includes('all')
+    );
+
+    if (authorizedItems.length > 0) {
+      const customMenu = ui.createMenu(menu.title);
+      
+      authorizedItems.forEach(item => {
+        customMenu.addItem(item.label, item.functionName);
+      });
+      
+      customMenu.addToUi();
+    }
+  });
 }

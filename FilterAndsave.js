@@ -1,10 +1,16 @@
+/**
+ * @file FilterAndsave.js
+ * @description Logic for filtering the sheet by department and exporting to PDF.
+ */
 
+var ReportTools = ReportTools || {};
 
 /**
- * API Version: Exports selected departments to PDF.
+ * Exports selected departments to PDF.
  * @param {string} input String of comma-separated departments.
+ * @return {object} Result object {success, base64, fileName, message, error}
  */
-function apiExportDepartments(input) {
+ReportTools.exportDepartments = function(input) {
   try {
     const sheet = SpreadsheetApp.getActiveSheet();
     const lastRow = sheet.getLastRow();
@@ -41,6 +47,13 @@ function apiExportDepartments(input) {
   } catch (e) {
     return { success: false, error: e.toString() };
   }
+};
+
+/**
+ * Global wrapper for backward compatibility and API Dispatcher.
+ */
+function apiExportDepartments(input) {
+  return ReportTools.exportDepartments(input);
 }
 
 /**
@@ -65,7 +78,7 @@ function showDeptSelector() {
 
     if (response.getSelectedButton() !== ui.Button.OK) return;
 
-    const result = apiExportDepartments(response.getResponseText());
+    const result = ReportTools.exportDepartments(response.getResponseText());
     
     if (result.success) {
       const htmlOutput = HtmlService.createHtmlOutput(`

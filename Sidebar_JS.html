@@ -1,0 +1,126 @@
+<script>
+  let userRole = 'default';
+
+  /**
+   * Filter tools based on user role only.
+   */
+  function applyRolePermissions() {
+    const sections = document.querySelectorAll('.section');
+
+    sections.forEach(section => {
+      const roles = (section.getAttribute('data-roles') || 'all').split(',');
+      const matchesRole = roles.includes(userRole) || roles.includes('all');
+      section.classList.toggle('hidden', !matchesRole);
+    });
+  }
+
+  /**
+   * Initialize the sidebar by fetching department list and user role.
+   */
+  window.addEventListener('load', () => {
+    // 1. Fetch User Role
+    google.script.run
+      .withSuccessHandler((role) => {
+        userRole = role;
+        applyRolePermissions();
+      })
+      .getCurrentUserRole();
+
+    // 2. Fetch Departments
+    google.script.run
+      .withSuccessHandler((depts) => {
+        const select = document.getElementById('statusDept');
+        if (!select) return;
+        select.innerHTML = ''; // Clear loading message
+
+        if (depts && depts.length > 0) {
+          depts.forEach(dept => {
+            const option = document.createElement('option');
+            option.value = dept;
+            option.textContent = dept;
+            select.appendChild(option);
+          });
+        } else {
+          const option = document.createElement('option');
+          option.value = "";
+          option.textContent = "No departments found";
+          select.appendChild(option);
+        }
+      })
+      .withFailureHandler((err) => {
+        const select = document.getElementById('statusDept');
+        if (select) select.innerHTML = '<option value="">Error loading</option>';
+      })
+      .apiDispatcher({ namespace: 'ReportTools', method: 'getUniqueDepartments' });
+  });
+
+  /**
+   * Universal runner for backend tools.
+   * @param {object} request The {namespace, method} object for the GAS function.
+   * @param {string|string[]} inputId The ID(s) of the input elements to fetch values from.
+   */
+  function runTool(request, inputId) {
+    const statusDiv = document.getElementById('status');
+    let inputVal = null;
+
+    if (inputId) {
+      if (Array.isArray(inputId)) {
+        inputVal = {};
+        inputId.forEach(id => {
+          const el = document.getElementById(id);
+          if (el) inputVal[id] = el.value;
+        });
+      } else {
+        const el = document.getElementById(inputId);
+        if (el) inputVal = el.value;
+      }
+    }
+
+    const btn = event.currentTarget;
+    const originalContent = btn.innerHTML;
+
+    // Reset UI
+    statusDiv.style.display = 'none';
+    statusDiv.className = '';
+    btn.disabled = true;
+    btn.innerHTML = '<span class="loading-spinner"></span> <span>Processing...</span>';
+
+    // Call the backend
+    google.script.run
+      .withSuccessHandler((result) => {
+        btn.disabled = false;
+        btn.innerHTML = originalContent;
+
+        if (result.success) {
+          // Success message display removed per user request
+          if (result.base64 && result.fileName) {
+            downloadFile(result.base64, result.fileName);
+          }
+        } else {
+          showStatus(result.error || 'Action failed.', 'error');
+        }
+      })
+      .withFailureHandler((error) => {
+        btn.disabled = false;
+        btn.innerHTML = originalContent;
+        showStatus('Error: ' + error.message, 'error');
+      })
+      .apiDispatcher(request, inputVal);
+  }
+
+  function showStatus(msg, type) {
+    const statusDiv = document.getElementById('status');
+    statusDiv.innerHTML = msg;
+    statusDiv.className = type;
+    statusDiv.style.display = 'block';
+  }
+
+  function downloadFile(base64, fileName) {
+    const link = document.createElement('a');
+    link.href = 'data:application/pdf;base64,' + base64;
+    link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+</script>

@@ -1,0 +1,32 @@
+<!-- Section 4: Reports -->
+<div class="section" data-category="Reports" data-keywords="export report pdf department" data-roles="admin,hr,default">
+  <div class="section-title">📊 Reports</div>
+  <div class="tool-group">
+    <div class="input-group">
+      <label for="depts">Filter Departments</label>
+      <input type="text" id="depts" placeholder="Optional: HR, Finance...">
+    </div>
+    <button onclick="runTool({namespace: 'ReportTools', method: 'exportDepartments'}, 'depts')" id="btn-export">Generate Report PDF</button>
+  </div>
+</div>
+
+<!-- Section 5: Status Update -->
+<div class="section" data-category="Reports" data-keywords="update status department paid pending" data-roles="admin,hr,default">
+  <div class="section-title">🔄 Status Update</div>
+  <div class="tool-group">
+    <div class="input-group">
+      <label for="statusDept">Department Name</label>
+      <select id="statusDept">
+        <option value="">Loading departments...</option>
+      </select>
+    </div>
+    <div class="input-group">
+      <label for="statusVal">Status</label>
+      <select id="statusVal">
+        <option value="Paid">Paid</option>
+        <option value="Pending">Pending</option>
+      </select>
+    </div>
+    <button onclick="runTool({namespace: 'ReportTools', method: 'updateDepartmentStatus'}, ['statusDept', 'statusVal'])" id="btn-status">Update Status</button>
+  </div>
+</div>

@@ -1,0 +1,14 @@
+<!-- Section 2: Transactions -->
+<div class="section" data-category="Transactions" data-keywords="highlight letter pdf export" data-roles="admin,finance,hr,default">
+  <div class="section-title">💳 Transactions</div>
+  <div class="tool-group">
+    <div class="input-group">
+      <label for="txnId">Transaction ID</label>
+      <input type="text" id="txnId" placeholder="e.g. TXN-1001">
+    </div>
+    <div style="display: flex; gap: 8px;">
+      <button onclick="runTool({namespace: 'FormattingTools', method: 'highlightTransaction'}, 'txnId')" id="btn-highlight" style="flex: 1;">Highlight</button>
+      <button onclick="runTool({namespace: 'TransactionTools', method: 'generateLetter'}, 'txnId')" id="btn-letter" style="flex: 1;">Export PDF</button>
+    </div>
+  </div>
+</div>

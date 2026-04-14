@@ -1,41 +1,32 @@
 # 🧰 Office Apps Scripts - GEMINI.md
 
 ## 🎯 Project Purpose & User Requirements
-The primary goal of this project is to consolidate multiple, previously disjointed Google Apps Script (GAS) tools into a single, unified, and **elegant** interface within Google Sheets.
+The primary goal of this project is to consolidate multiple Google Apps Script (GAS) tools into a unified, scalable platform within Google Sheets.
 
 ### Key Requirements:
-- **Unified Interface**: All tools must be accessible from a single, persistent **Sidebar**.
-- **Scalability**: The system must be robust enough to handle many tools without becoming cluttered or unmanageable.
-- **Elegant UX/UI**: High emphasis on a modern, professional look using the **Inter** font family, a card-based layout, and a clean slate/blue color palette.
-- **Integrated Inputs**: Tools should use the sidebar for user input (text fields, dropdowns) instead of intrusive modal dialog boxes or prompts whenever possible.
-- **Automated Deployment**: Use `clasp` for local development and reliable syncing with the Apps Script environment.
+- **Unified Sidebar**: A single, persistent sidebar providing access to all tools in a vertically stacked, modern interface.
+- **Multi-Menu Integration**: Support for multiple custom top-level menus in the Spreadsheet UI, each containing specialized tool items.
+- **Scalability & Robustness**: A decoupled architecture designed to handle hundreds of tools across various categories (Finance, HR, Formatting, etc.).
+- **Role-Based Access Control (RBAC)**: Dynamic visibility of menus and sidebar tools based on the active user's role.
 
-## 🏛️ Architectural Blueprint: The "API-First" Dispatcher
-To achieve robustness and scalability, the project follows a strict decoupled architecture.
+## 🏛️ Architectural Blueprint: Scalable "API-First" Framework
 
-### 1. Frontend (The "Face") - `Sidebar.html`
-- **UI Components**: Cards/Sections with clear titles and integrated form elements.
-- **Client JS**: A universal `runTool(toolName, inputIds)` function that:
-  - Collects values from one or multiple input fields.
-  - Sends a "Payload" (data object) to the backend.
-  - Handles the "State" (disabling buttons, showing a loading spinner).
-  - Displays a "Toast" message (success/error) upon completion.
+### 1. Dynamic Configuration (`Config.js`)
+- **Central Source of Truth**: All menus, sub-items, and role-based permissions are defined in the `APP_CONFIG` object.
+- **Menu Generation**: The spreadsheet UI is built dynamically on `onOpen` by iterating through the configuration.
 
-### 2. Communication Hub - `API.js`
-- **The Dispatcher**: A central `apiDispatcher` function that acts as a router. Every client request passes through here before reaching the specific tool logic.
-- **Benefits**: Simplifies the frontend-backend bridge and allows for easy auditing or logging of all tool calls in one place.
+### 2. Frontend (Single Page Application) - `Sidebar.html`
+- **Modular Components**: The sidebar UI is composed of smaller HTML fragments (e.g., `Sidebar_Transactions.html`) included dynamically via a backend `include()` helper.
+- **Unified Interface**: All tools are vertically stacked for easy access, with automatic role-based visibility filtering.
+- **Client JS**: A universal `runTool({namespace, method}, inputIds)` function that facilitates communication with the backend.
 
-### 3. Backend (The "Brain") - Specialized JS Files
-- **API Version Functions**: Every tool logic starts with an `api...` function (e.g., `apiUpdateDepartmentStatus`).
-- **Standardized Response**: All backend functions MUST return a JSON object:
-  ```json
-  {
-    "success": true, 
-    "message": "Operation description",
-    "base64": "...", // Optional: For file downloads
-    "fileName": "..." // Optional: For file downloads
-  }
-  ```
+### 3. Namespace-Based Backend (`*.js`)
+- **Logical Grouping**: Tools are grouped into global namespace objects (e.g., `FinanceTools`, `ReportTools`) to prevent global variable pollution and ease maintainability.
+- **Standardized Response**: All functions return a consistent JSON object: `{success: true/false, message: "...", base64: "...", fileName: "..."}`.
+
+### 4. Communication Hub (`API.js`)
+- **The Dispatcher**: A central `apiDispatcher(request, payload)` function that routes client requests to the appropriate namespace and method dynamically.
+- **Secure Invocation**: Resolves target functions using the global scope (`this[namespace][method]`), ensuring a robust bridge between frontend and backend.
 
 ## 🛠️ Current Tools & Instructions
 

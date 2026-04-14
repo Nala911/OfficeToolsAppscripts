@@ -3,11 +3,14 @@
  * @description Updates column G (Status) for a specific department in column D.
  */
 
+var ReportTools = ReportTools || {};
+
 /**
- * API Version: Updates the status for a given department.
+ * Updates the status for a given department.
  * @param {object} input Object containing {statusDept, statusVal}
+ * @return {object} Result object {success, message, error}
  */
-function apiUpdateDepartmentStatus(input) {
+ReportTools.updateDepartmentStatus = function(input) {
   try {
     const deptName = (input.statusDept || '').trim();
     const statusValue = (input.statusVal || '').trim();
@@ -42,13 +45,13 @@ function apiUpdateDepartmentStatus(input) {
   } catch (e) {
     return { success: false, error: e.toString() };
   }
-}
+};
 
 /**
  * Fetches unique department names from Column D of the "Table1" sheet.
  * @return {string[]} Array of unique department names.
  */
-function getUniqueDepartments() {
+ReportTools.getUniqueDepartments = function() {
   try {
     const ss = SpreadsheetApp.getActiveSpreadsheet();
     let sheet = ss.getSheetByName('Table1');
@@ -77,4 +80,15 @@ function getUniqueDepartments() {
     console.error('Error in getUniqueDepartments:', e.toString());
     return [];
   }
+};
+
+/**
+ * Global wrappers for backward compatibility and API Dispatcher.
+ */
+function apiUpdateDepartmentStatus(input) {
+  return ReportTools.updateDepartmentStatus(input);
+}
+
+function getUniqueDepartments() {
+  return ReportTools.getUniqueDepartments();
 }
