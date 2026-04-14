@@ -1,13 +1,56 @@
 
 
-function showDeptSelector() {
+/**
+ * API Version: Exports selected departments to PDF.
+ * @param {string} input String of comma-separated departments.
+ */
+function apiExportDepartments(input) {
   try {
     const sheet = SpreadsheetApp.getActiveSheet();
     const lastRow = sheet.getLastRow();
     
-    if (lastRow < 2) {
-      throw new Error("The sheet appears to be empty or only has a header.");
+    if (lastRow < 2) throw new Error("The sheet is empty.");
+
+    const data = sheet.getRange(2, 4, lastRow - 1, 1).getValues();
+    const uniqueDepts = [...new Set(data.flat())].filter(String).sort();
+
+    let selectedDepts = [];
+    const trimmedInput = (input || '').trim();
+    
+    if (trimmedInput === '') {
+      selectedDepts = uniqueDepts;
+    } else {
+      selectedDepts = trimmedInput.split(',').map(d => d.trim()).filter(String);
+      const invalid = selectedDepts.filter(d => !uniqueDepts.includes(d));
+      if (invalid.length > 0) {
+        return { success: false, error: 'Invalid departments: ' + invalid.join(', ') };
+      }
     }
+
+    const result = processSelection(selectedDepts);
+    if (result.success) {
+      return {
+        success: true,
+        base64: result.bytes,
+        fileName: result.fileName,
+        message: 'PDF exported successfully for ' + selectedDepts.length + ' departments.'
+      };
+    } else {
+      return { success: false, error: result.error };
+    }
+  } catch (e) {
+    return { success: false, error: e.toString() };
+  }
+}
+
+/**
+ * Legacy wrapper for the top menu.
+ */
+function showDeptSelector() {
+  try {
+    const sheet = SpreadsheetApp.getActiveSheet();
+    const lastRow = sheet.getLastRow();
+    if (lastRow < 2) throw new Error("The sheet appears to be empty.");
 
     const data = sheet.getRange(2, 4, lastRow - 1, 1).getValues();
     const uniqueDepts = [...new Set(data.flat())].filter(String).sort();
@@ -16,56 +59,30 @@ function showDeptSelector() {
     const response = ui.prompt(
       'Filter and Export to PDF',
       'Available Departments:\n' + uniqueDepts.join(', ') + 
-      '\n\nEnter departments to export (comma-separated) or leave blank to export all:',
+      '\n\nEnter departments to export (comma-separated) or leave blank for all:',
       ui.ButtonSet.OK_CANCEL
     );
 
-    if (response.getSelectedButton() !== ui.Button.OK) {
-      return;
-    }
+    if (response.getSelectedButton() !== ui.Button.OK) return;
 
-    let selectedDepts = [];
-    const input = response.getResponseText().trim();
-    
-    if (input === '') {
-      selectedDepts = uniqueDepts;
-    } else {
-      selectedDepts = input.split(',').map(d => d.trim()).filter(String);
-      const invalid = selectedDepts.filter(d => !uniqueDepts.includes(d));
-      if (invalid.length > 0) {
-        ui.alert('Invalid departments entered: ' + invalid.join(', '));
-        return;
-      }
-    }
-
-    // Give some immediate feedback that it's running
-    SpreadsheetApp.getActiveSpreadsheet().toast('Processing PDF export...', 'Please Wait', 8);
-
-    const result = processSelection(selectedDepts);
+    const result = apiExportDepartments(response.getResponseText());
     
     if (result.success) {
-      // Use a minimal inline HTML just to trigger the local download and instantly close.
       const htmlOutput = HtmlService.createHtmlOutput(`
-        <div style="font-family: sans-serif; text-align: center; padding: 20px;">
-          Downloading file... You can close this window.
-        </div>
         <script>
           const link = document.createElement('a');
-          link.href = 'data:application/pdf;base64,${result.bytes}';
+          link.href = 'data:application/pdf;base64,${result.base64}';
           link.download = '${result.fileName}';
-          document.body.appendChild(link);
           link.click();
-          setTimeout(() => google.script.host.close(), 1500);
+          setTimeout(() => google.script.host.close(), 1000);
         </script>
       `).setWidth(350).setHeight(100);
-      
-      ui.showModalDialog(htmlOutput, 'Export Successful');
+      ui.showModalDialog(htmlOutput, 'Exporting...');
     } else {
-      ui.alert('Export Failed', "Error: " + result.error, ui.ButtonSet.OK);
+      ui.alert('Export Failed', result.error, ui.ButtonSet.OK);
     }
-
   } catch (e) {
-    SpreadsheetApp.getUi().alert("Error loading departments: " + e.message);
+    SpreadsheetApp.getUi().alert("Error: " + e.message);
   }
 }
 

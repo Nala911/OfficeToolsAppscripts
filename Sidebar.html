@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary-color: #2563eb;
+      --secondary-color: #64748b;
+      --accent-color: #3b82f6;
+      --bg-color: #f8fafc;
+      --card-bg: #ffffff;
+      --text-main: #1e293b;
+      --text-muted: #64748b;
+      --border-color: #e2e8f0;
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    }
+
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      margin: 0;
+      padding: 16px;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .header {
+      margin-bottom: 24px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .header h2 {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .container {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .section {
+      background: var(--card-bg);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow);
+      padding: 16px;
+      transition: transform 0.2s ease;
+    }
+
+    .section-title {
+      font-weight: 600;
+      color: var(--text-main);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .tool-group {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    label {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-muted);
+    }
+
+    input[type="text"],
+    input[type="number"],
+    select {
+      padding: 10px 12px;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      width: 100%;
+      box-sizing: border-box;
+      outline: none;
+      font-family: inherit;
+      font-size: 14px;
+      transition: all 0.2s ease;
+      background: #fff;
+    }
+
+    input:focus,
+    select:focus {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+
+    button {
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      padding: 11px 16px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 14px;
+      transition: all 0.2s ease;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    }
+
+    button:hover {
+      background-color: #1d4ed8;
+      transform: translateY(-1px);
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
+
+    button:disabled {
+      background-color: var(--secondary-color);
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn-secondary {
+      background-color: #fff;
+      color: var(--text-main);
+      border: 1px solid var(--border-color);
+    }
+
+    .btn-secondary:hover {
+      background-color: var(--bg-color);
+      border-color: var(--text-muted);
+    }
+
+    #status {
+      margin-top: 24px;
+      padding: 12px;
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      font-weight: 500;
+      display: none;
+      animation: slideUp 0.3s ease-out;
+    }
+
+    @keyframes slideUp {
+      from { transform: translateY(10px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    .success {
+      background-color: #f0fdf4;
+      color: #166534;
+      border: 1px solid #bbf7d0;
+      display: block !important;
+    }
+
+    .error {
+      background-color: #fef2f2;
+      color: #991b1b;
+      border: 1px solid #fecaca;
+      display: block !important;
+    }
+
+    .loading-spinner {
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top-color: #fff;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <h2>🧰 Office Tools</h2>
+</div>
+
+<div class="container">
+  <!-- Section 2: Transactions -->
+  <div class="section">
+    <div class="section-title">💳 Transactions</div>
+    <div class="tool-group">
+      <div class="input-group">
+        <label for="txnId">Transaction ID</label>
+        <input type="text" id="txnId" placeholder="e.g. TXN-1001">
+      </div>
+      <div style="display: flex; gap: 8px;">
+        <button onclick="runTool('highlightTransaction', 'txnId')" id="btn-highlight" style="flex: 1;">Highlight</button>
+        <button onclick="runTool('generateLetter', 'txnId')" id="btn-letter" style="flex: 1;">Export PDF</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section 3: Calculations -->
+  <div class="section">
+    <div class="section-title">💰 Calculations</div>
+    <div class="tool-group">
+      <div class="input-group">
+        <label for="deductAmount">Amount to Deduct</label>
+        <input type="number" id="deductAmount" placeholder="0.00" step="0.01">
+      </div>
+      <button onclick="runTool('deductAmount', 'deductAmount')" id="btn-deduct">Apply Deduction</button>
+    </div>
+  </div>
+
+  <!-- Section 4: Reports -->
+  <div class="section">
+    <div class="section-title">📊 Reports</div>
+    <div class="tool-group">
+      <div class="input-group">
+        <label for="depts">Filter Departments</label>
+        <input type="text" id="depts" placeholder="Optional: HR, Finance...">
+      </div>
+      <button onclick="runTool('exportDepts', 'depts')" id="btn-export">Generate Report PDF</button>
+    </div>
+  </div>
+
+  <!-- Section 5: Status Update -->
+  <div class="section">
+    <div class="section-title">🔄 Status Update</div>
+    <div class="tool-group">
+      <div class="input-group">
+        <label for="statusDept">Department Name</label>
+        <select id="statusDept">
+          <option value="">Loading departments...</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label for="statusVal">Status</label>
+        <select id="statusVal">
+          <option value="Paid">Paid</option>
+          <option value="Pending">Pending</option>
+        </select>
+      </div>
+      <button onclick="runTool('updateStatus', ['statusDept', 'statusVal'])" id="btn-status">Update Status</button>
+    </div>
+  </div>
+
+  <div id="status"></div>
+</div>
+
+<script>
+  /**
+   * Initialize the sidebar by fetching department list.
+   */
+  window.addEventListener('load', () => {
+    google.script.run
+      .withSuccessHandler((depts) => {
+        const select = document.getElementById('statusDept');
+        select.innerHTML = ''; // Clear loading message
+        
+        if (depts && depts.length > 0) {
+          depts.forEach(dept => {
+            const option = document.createElement('option');
+            option.value = dept;
+            option.textContent = dept;
+            select.appendChild(option);
+          });
+        } else {
+          const option = document.createElement('option');
+          option.value = "";
+          option.textContent = "No departments found";
+          select.appendChild(option);
+        }
+      })
+      .withFailureHandler((err) => {
+        const select = document.getElementById('statusDept');
+        select.innerHTML = '<option value="">Error loading</option>';
+      })
+      .apiDispatcher('getUniqueDepartments');
+  });
+
+  /**
+   * Universal runner for backend tools.
+   * @param {string} toolName The name of the GAS function or mapping.
+   * @param {string|string[]} inputId The ID(s) of the input elements to fetch values from.
+   */
+  function runTool(toolName, inputId) {
+    const statusDiv = document.getElementById('status');
+    let inputVal = null;
+    
+    if (inputId) {
+      if (Array.isArray(inputId)) {
+        inputVal = {};
+        inputId.forEach(id => {
+          inputVal[id] = document.getElementById(id).value;
+        });
+      } else {
+        inputVal = document.getElementById(inputId).value;
+      }
+    }
+    
+    const btn = event.currentTarget;
+    const originalContent = btn.innerHTML;
+
+    // Reset UI
+    statusDiv.style.display = 'none';
+    statusDiv.className = '';
+    btn.disabled = true;
+    btn.innerHTML = '<span class="loading-spinner"></span> <span>Processing...</span>';
+
+    // Call the backend
+    google.script.run
+      .withSuccessHandler((result) => {
+        btn.disabled = false;
+        btn.innerHTML = originalContent;
+        
+        if (result.success) {
+          // Success message removed per user request
+          if (result.base64 && result.fileName) {
+            downloadFile(result.base64, result.fileName);
+          }
+        } else {
+          showStatus(result.error || 'Action failed.', 'error');
+        }
+      })
+      .withFailureHandler((error) => {
+        btn.disabled = false;
+        btn.innerHTML = originalContent;
+        showStatus('Error: ' + error.message, 'error');
+      })
+      .apiDispatcher(toolName, inputVal);
+  }
+
+  function showStatus(msg, type) {
+    const statusDiv = document.getElementById('status');
+    statusDiv.innerHTML = msg;
+    statusDiv.className = type;
+  }
+
+  function downloadFile(base64, fileName) {
+    const link = document.createElement('a');
+    link.href = 'data:application/pdf;base64,' + base64;
+    link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+</script>
+
+</body>
+</html>

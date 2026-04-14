@@ -5,13 +5,18 @@
 
 /**
  * Triggered automatically when the spreadsheet is opened.
- * Adds a custom menu "Office Tools" to the UI.
+ * Adds custom menus to the UI.
  */
 function onOpen() {
   var ui = SpreadsheetApp.getUi();
+  
+  // Office Tools Menu
   ui.createMenu('🧰 Office Tools')
+    .addItem('🚀 Open Sidebar', 'showSidebar')
+    .addToUi();
+
+  // Formatting Tools Menu
+  ui.createMenu('✨ Formatting tools')
     .addItem('📏 Autofit Columns', 'autofitColumns')
-    .addItem('💰 Deduct Amounts', 'deductAmountsFromColumnF')
-    .addItem('📋 Export Departments to PDF', 'showDeptSelector')
     .addToUi();
 }

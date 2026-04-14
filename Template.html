@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body { font-family: 'serif'; padding: 40px; color: #333; line-height: 1.5; }
+    .header { text-align: right; border-bottom: 2px solid #1a2a6c; margin-bottom: 30px; }
+    .company { font-size: 22px; font-weight: bold; color: #1a2a6c; }
+    .content { text-align: justify; }
+    .details-table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+    .details-table th { background: #f2f2f2; text-align: left; padding: 8px; border: 1px solid #ddd; }
+    .details-table td { padding: 8px; border: 1px solid #ddd; }
+    .footer { margin-top: 50px; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="company">CORPORATION NAME</div>
+    <p>123 Business Way, New York, NY</p>
+  </div>
+
+  <div class="content">
+    <p><strong>Date:</strong> <?= Date ?></p>
+    <p>To,<br>Accounts Department</p>
+    
+    <h3>Subject: Transaction Confirmation - <?= Transaction_ID ?></h3>
+
+    <p>Dear Sir/Madam,</p>
+    <p>This is an official confirmation regarding the transaction processed for <strong><?= Description ?></strong>.</p>
+
+    <table class="details-table">
+      <tr>
+        <th>Category</th>
+        <td><?= Category ?></td>
+      </tr>
+      <tr>
+        <th>Department</th>
+        <td><?= Department ?></td>
+      </tr>
+      <tr>
+        <th>Amount</th>
+        <td><strong><?= Amount ?></strong></td>
+      </tr>
+      <tr>
+        <th>Status</th>
+        <td><?= Status ?></td>
+      </tr>
+    </table>
+
+    <p>Please keep this document for your records. If you have any questions, please contact our support team.</p>
+  </div>
+
+  <div class="footer">
+    <p>Sincerely,<br><br><br><strong>Authorized Signatory</strong><br>Finance Division</p>
+  </div>
+</body>
+</html>
