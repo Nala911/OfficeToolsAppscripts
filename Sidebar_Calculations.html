@@ -1,11 +1,13 @@
-<!-- Section 3: Calculations -->
-<div class="section" data-category="Calculations" data-keywords="deduct amount subtract money" data-roles="admin,finance,default">
-  <div class="section-title">💰 Calculations</div>
+<!-- Section: Calculations -->
+<div class="section" data-category="Calculations" data-roles="all">
+  <div class="section-title"><span>📊</span> Calculations</div>
   <div class="tool-group">
     <div class="input-group">
-      <label for="deductAmount">Amount to Deduct</label>
-      <input type="number" id="deductAmount" placeholder="0.00" step="0.01">
+      <label for="deductAmount">Target Amount</label>
+      <input type="number" id="deductAmount" placeholder="e.g. 500.00" step="0.01">
     </div>
-    <button onclick="runTool({namespace: 'FinanceTools', method: 'deductAmounts'}, 'deductAmount')" id="btn-deduct">Apply Deduction</button>
+    <button onclick="runTool({namespace: 'FinanceTools', method: 'deductAmounts'}, 'deductAmount')" id="btn-deduct">
+      Apply Deduction Flow
+    </button>
   </div>
 </div>
