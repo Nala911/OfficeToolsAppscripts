@@ -46,7 +46,8 @@ function handleLegacyRequest(toolName, inputVal) {
     'deductAmount': (val) => FinanceTools.deductAmounts(val),
     'exportDepts': (val) => ReportTools.exportDepartments(val),
     'updateStatus': (val) => ReportTools.updateDepartmentStatus(val),
-    'getUniqueDepartments': () => ReportTools.getUniqueDepartments()
+    'getUniqueDepartments': () => ReportTools.getUniqueDepartments(),
+    'removeOldTransactions': (val) => TransactionTools.removeOldTransactions(val)
   };
 
   if (legacyMap[toolName]) {

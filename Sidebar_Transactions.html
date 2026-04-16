@@ -9,6 +9,7 @@
     <div style="display: flex; gap: 8px;">
       <button onclick="runTool({namespace: 'FormattingTools', method: 'highlightTransaction'}, 'txnId')" id="btn-highlight" style="flex: 1;">Highlight</button>
       <button onclick="runTool({namespace: 'TransactionTools', method: 'generateLetter'}, 'txnId')" id="btn-letter" style="flex: 1;">Export PDF</button>
+      <button onclick="runTool({namespace: 'TransactionTools', method: 'removeOldTransactions'}, 'txnId')" id="btn-remove" style="flex: 1; background-color: #ef4444;">Remove Past</button>
     </div>
   </div>
 </div>

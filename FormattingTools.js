@@ -3,7 +3,7 @@
  * @description Sheet formatting utilities for rapid cleanup.
  */
 
-const FormattingTools = {
+var FormattingTools = {
   /**
    * Automatically resizes all populated columns to fit their content.
    * @return {object} Result object {success, message, error}

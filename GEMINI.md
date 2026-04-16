@@ -4,7 +4,7 @@
 The primary goal of this project is to consolidate multiple Google Apps Script (GAS) tools into a unified, scalable platform within Google Sheets.
 
 ### Key Requirements:
-- **Unified Sidebar**: A single, persistent sidebar providing access to all tools in a vertically stacked, modern interface.
+- **Unified Sidebars**: A single, persistent sidebar providing access to all tools in a vertically stacked, modern interface.
 - **Multi-Menu Integration**: Support for multiple custom top-level menus in the Spreadsheet UI, each containing specialized tool items.
 - **Scalability & Robustness**: A decoupled architecture designed to handle hundreds of tools across various categories (Finance, HR, Formatting, etc.).
 - **Role-Based Access Control (RBAC)**: Dynamic visibility of menus and sidebar tools based on the active user's role.

@@ -54,12 +54,7 @@ ReportTools.updateDepartmentStatus = function(input) {
 ReportTools.getUniqueDepartments = function() {
   try {
     const ss = SpreadsheetApp.getActiveSpreadsheet();
-    let sheet = ss.getSheetByName('Table1');
-    
-    // Fallback to active sheet if 'Table1' doesn't exist
-    if (!sheet) {
-      sheet = ss.getActiveSheet();
-    }
+    const sheet = ss.getActiveSheet();
     
     const lastRow = sheet.getLastRow();
     if (lastRow < 2) return [];

@@ -3,7 +3,7 @@
  * @description Tool to deduct a specific amount from column F cumulatively.
  */
 
-const FinanceTools = {
+var FinanceTools = {
   /**
    * Deducts the amount from row 2 downwards.
    * @param {number|string} amount The total amount to deduct.

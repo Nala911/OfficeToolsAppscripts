@@ -3,7 +3,7 @@
  * @description Logic for mapping row data to Template.html and generating PDFs.
  */
 
-const TransactionTools = {
+var TransactionTools = {
   /**
    * Generates PDF and returns base64.
    * @param {string} txnId
@@ -51,6 +51,51 @@ const TransactionTools = {
     } catch (e) {
       return { success: false, error: e.toString() };
     }
+  },
+
+  /**
+   * Removes all rows above the given transaction ID in 'Table1'.
+   * @param {string} txnId 
+   * @return {object} Result of the operation.
+   */
+  removeOldTransactions: function(txnId) {
+    try {
+      if (!txnId) return { success: false, error: 'Transaction ID is required.' };
+
+      const ss = SpreadsheetApp.getActiveSpreadsheet();
+      const sheet = ss.getActiveSheet();
+
+      const data = sheet.getDataRange().getValues();
+      let targetRowIndex = -1;
+
+      // Find the row with the transaction ID in Column B (index 1)
+      for (let i = 1; i < data.length; i++) {
+        const cellValue = data[i][1].toString().trim();
+        // Match either the exact input, or the input prefixed with "TXN-"
+        if (cellValue === txnId || cellValue === 'TXN-' + txnId) {
+          targetRowIndex = i + 1; // GAS is 1-indexed
+          break;
+        }
+      }
+
+      if (targetRowIndex === -1) {
+        return { success: false, error: 'Transaction ID ' + txnId + ' not found in Column B.' };
+      }
+
+      if (targetRowIndex <= 2) {
+        return { success: true, message: 'No rows above the specified transaction to remove.' };
+      }
+
+      const numRowsToDelete = targetRowIndex - 2;
+      sheet.deleteRows(2, numRowsToDelete);
+
+      return {
+        success: true,
+        message: 'Successfully removed ' + numRowsToDelete + ' old transaction row(s).'
+      };
+    } catch (e) {
+      return { success: false, error: e.toString() };
+    }
   }
 };
 
@@ -59,6 +104,41 @@ const TransactionTools = {
  */
 function apiGenerateTransactionLetter(txnId) {
   return TransactionTools.generateLetter(txnId);
+}
+
+/**
+ * API Wrapper for removing old transactions.
+ */
+function apiRemoveOldTransactions(txnId) {
+  return TransactionTools.removeOldTransactions(txnId);
+}
+
+/**
+ * Triggered from the "Office Tools" menu.
+ */
+function promptForTransactionRemoval() {
+  const ui = SpreadsheetApp.getUi();
+  const response = ui.prompt(
+    '🗑️ Transaction Remover',
+    'Enter Transaction ID (e.g., 1200 or TXN-1200). All rows above will be removed:',
+    ui.ButtonSet.OK_CANCEL
+  );
+
+  if (response.getSelectedButton() == ui.Button.OK) {
+    const txnId = response.getResponseText().trim();
+    if (!txnId) {
+      ui.alert('No Transaction ID entered.');
+      return;
+    }
+
+    const result = TransactionTools.removeOldTransactions(txnId);
+
+    if (result.success) {
+      ui.alert(result.message);
+    } else {
+      ui.alert('Error: ' + result.error);
+    }
+  }
 }
 
 /**

@@ -39,7 +39,8 @@ const APP_CONFIG = {
     {
       title: '🧰 Office Tools',
       items: [
-        { label: '🚀 Open Sidebar', functionName: 'showSidebar', roles: ['admin', 'finance', 'hr', 'default'] }
+        { label: '🚀 Open Sidebar', functionName: 'showSidebar', roles: ['admin', 'finance', 'hr', 'default'] },
+        { label: '🗑️ Transaction Remover', functionName: 'promptForTransactionRemoval', roles: ['admin', 'finance'] }
       ]
     },
     {
