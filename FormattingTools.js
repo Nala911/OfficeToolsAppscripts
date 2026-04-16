@@ -64,42 +64,15 @@ var FormattingTools = {
     } catch (e) {
       return { success: false, error: e.toString() };
     }
-  }
+  },
 };
 
 /**
- * Global wrappers for backward compatibility and API Dispatcher.
+ * Menu wrapper for Autofit Columns
  */
-function apiAutofitColumns() {
-  return FormattingTools.autofitColumns();
-}
-
-function apiHighlightTransaction(transactionId) {
-  return FormattingTools.highlightTransaction(transactionId);
-}
-
-/**
- * Legacy wrapper for the top menu.
- */
-function autofitColumns() {
+function menuAutofitColumns() {
   const result = FormattingTools.autofitColumns();
   if (!result.success) {
-    SpreadsheetApp.getUi().alert(result.error);
+    SpreadsheetApp.getUi().alert('Error: ' + result.error);
   }
 }
-
-/**
- * Legacy wrapper for the top menu.
- */
-function highlightTransactionRow() {
-  var ui = SpreadsheetApp.getUi();
-  var response = ui.prompt('Highlight Transaction', 'Enter Transaction ID (e.g., 1005):', ui.ButtonSet.OK_CANCEL);
-  
-  if (response.getSelectedButton() == ui.Button.OK) {
-    const result = FormattingTools.highlightTransaction(response.getResponseText());
-    if (!result.success) {
-      ui.alert(result.error);
-    }
-  }
-}
-

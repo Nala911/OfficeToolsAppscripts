@@ -49,55 +49,6 @@ ReportTools.exportDepartments = function(input) {
   }
 };
 
-/**
- * Global wrapper for backward compatibility and API Dispatcher.
- */
-function apiExportDepartments(input) {
-  return ReportTools.exportDepartments(input);
-}
-
-/**
- * Legacy wrapper for the top menu.
- */
-function showDeptSelector() {
-  try {
-    const sheet = SpreadsheetApp.getActiveSheet();
-    const lastRow = sheet.getLastRow();
-    if (lastRow < 2) throw new Error("The sheet appears to be empty.");
-
-    const data = sheet.getRange(2, 4, lastRow - 1, 1).getValues();
-    const uniqueDepts = [...new Set(data.flat())].filter(String).sort();
-
-    const ui = SpreadsheetApp.getUi();
-    const response = ui.prompt(
-      'Filter and Export to PDF',
-      'Available Departments:\n' + uniqueDepts.join(', ') + 
-      '\n\nEnter departments to export (comma-separated) or leave blank for all:',
-      ui.ButtonSet.OK_CANCEL
-    );
-
-    if (response.getSelectedButton() !== ui.Button.OK) return;
-
-    const result = ReportTools.exportDepartments(response.getResponseText());
-    
-    if (result.success) {
-      const htmlOutput = HtmlService.createHtmlOutput(`
-        <script>
-          const link = document.createElement('a');
-          link.href = 'data:application/pdf;base64,${result.base64}';
-          link.download = '${result.fileName}';
-          link.click();
-          setTimeout(() => google.script.host.close(), 1000);
-        </script>
-      `).setWidth(350).setHeight(100);
-      ui.showModalDialog(htmlOutput, 'Exporting...');
-    } else {
-      ui.alert('Export Failed', result.error, ui.ButtonSet.OK);
-    }
-  } catch (e) {
-    SpreadsheetApp.getUi().alert("Error: " + e.message);
-  }
-}
 
 function processSelection(selectedDepts) {
   try {

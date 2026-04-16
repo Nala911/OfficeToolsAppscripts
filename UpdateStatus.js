@@ -77,13 +77,3 @@ ReportTools.getUniqueDepartments = function() {
   }
 };
 
-/**
- * Global wrappers for backward compatibility and API Dispatcher.
- */
-function apiUpdateDepartmentStatus(input) {
-  return ReportTools.updateDepartmentStatus(input);
-}
-
-function getUniqueDepartments() {
-  return ReportTools.getUniqueDepartments();
-}

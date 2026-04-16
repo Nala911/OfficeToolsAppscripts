@@ -5,19 +5,16 @@
 
 /**
  * Dispatches calls from the sidebar to the appropriate backend function.
- * Supports both legacy string-based tool names and the new namespace/method objects.
  * 
- * @param {string|object} request Either a toolName string (legacy) or {namespace, method} object.
+ * @param {object} request Provide {namespace, method} object string locating the target.
  * @param {any} payload The data to pass to the tool.
- * @return {object} Result of the operation.
+ * @return {object} Standardized result of the operation.
  */
 function apiDispatcher(request, payload) {
-  // 1. Handle Legacy String Requests
   if (typeof request === 'string') {
-    return handleLegacyRequest(request, payload);
+    return { success: false, error: 'Legacy string requests are no longer supported. Please update to the new namespace architecture.' };
   }
 
-  // 2. Handle New Namespace/Method Requests
   const { namespace, method } = request;
   
   try {
@@ -25,36 +22,15 @@ function apiDispatcher(request, payload) {
     const targetNamespace = this[namespace];
     
     if (targetNamespace && typeof targetNamespace[method] === 'function') {
-      return targetNamespace[method](payload);
+      const result = targetNamespace[method](payload);
+      return result;
     }
     
     return { success: false, error: `Tool not found: ${namespace}.${method}` };
   } catch (e) {
-    console.error(`Dispatcher Error: ${e.toString()}`);
-    return { success: false, error: `Execution error: ${e.toString()}` };
+    console.error(`Dispatcher Error [${namespace}.${method}]: ${e.toString()}`);
+    return { success: false, error: `Execution error in backend: ${e.toString()}` };
   }
-}
-
-/**
- * Map of legacy tool names to their new namespace implementations.
- */
-function handleLegacyRequest(toolName, inputVal) {
-  const legacyMap = {
-    'autofitColumns': () => FormattingTools.autofitColumns(),
-    'highlightTransaction': (val) => FormattingTools.highlightTransaction(val),
-    'generateLetter': (val) => TransactionTools.generateLetter(val),
-    'deductAmount': (val) => FinanceTools.deductAmounts(val),
-    'exportDepts': (val) => ReportTools.exportDepartments(val),
-    'updateStatus': (val) => ReportTools.updateDepartmentStatus(val),
-    'getUniqueDepartments': () => ReportTools.getUniqueDepartments(),
-    'removeOldTransactions': (val) => TransactionTools.removeOldTransactions(val)
-  };
-
-  if (legacyMap[toolName]) {
-    return legacyMap[toolName](inputVal);
-  }
-
-  return { success: false, error: 'Unknown legacy tool: ' + toolName };
 }
 
 /**

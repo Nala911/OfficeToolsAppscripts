@@ -54,25 +54,3 @@ var FinanceTools = {
     }
   }
 };
-
-/**
- * Global wrapper for backward compatibility and API Dispatcher.
- */
-function apiDeductAmounts(amount) {
-  return FinanceTools.deductAmounts(amount);
-}
-
-/**
- * Legacy wrapper for the top menu.
- */
-function deductAmountsFromColumnF() {
-  const ui = SpreadsheetApp.getUi();
-  const response = ui.prompt('Deduct Amounts', 'Enter the total amount to deduct from column F:', ui.ButtonSet.OK_CANCEL);
-
-  if (response.getSelectedButton() === ui.Button.OK) {
-    const result = FinanceTools.deductAmounts(response.getResponseText());
-    if (!result.success) {
-      ui.alert('Error', result.error, ui.ButtonSet.OK);
-    }
-  }
-}

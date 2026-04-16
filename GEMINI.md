@@ -4,7 +4,7 @@
 The primary goal of this project is to consolidate multiple Google Apps Script (GAS) tools into a unified, scalable platform within Google Sheets.
 
 ### Key Requirements:
-- **Unified Sidebars**: A single, persistent sidebar providing access to all tools in a vertically stacked, modern interface.
+- **Flexible UI Architecture**: The project supports combining multiple tools into a unified, vertically stacked sidebar, OR keeping standalone tools in custom top-level Google Sheets menus, depending on user discretion.
 - **Multi-Menu Integration**: Support for multiple custom top-level menus in the Spreadsheet UI, each containing specialized tool items.
 - **Scalability & Robustness**: A decoupled architecture designed to handle hundreds of tools across various categories (Finance, HR, Formatting, etc.).
 - **Role-Based Access Control (RBAC)**: Dynamic visibility of menus and sidebar tools based on the active user's role.
@@ -48,11 +48,11 @@ clasp push
 ```
 
 ### Adding a New Tool (Step-by-Step)
-1.  **Create Backend**: Add the logic in a new `.js` file or append to an existing one. Use the `api...` prefix.
-2.  **Standardize Return**: Ensure it returns the `{success, message}` object.
-3.  **Register Dispatcher**: Add a new `case` to `apiDispatcher` in `API.js`.
-4.  **Update UI**: Add a new `<div class="section">` in `Sidebar.html` with necessary inputs.
-5.  **Connect**: Call `runTool('yourNewTool', 'inputId')` from the button's `onclick` event.
+1. **Create Backend**: Add the logic in a new `.js` file or append to an existing namespace object (e.g., `FinanceTools.myNewTool`).
+2. **Standardize Return**: Ensure the namespace function returns the `{success, message}` object.
+3. **Register via Interface**: 
+   - *If Sidebar*: Add a new `<div class="section">` in a `Sidebar_*.html` snippet with inputs. Call `runTool({namespace: 'Obj', method: 'func'}, 'inputId')` from the button.
+   - *If Custom Menu*: Create a global wrapper function in the backend (e.g., `function menuMyNewTool() { ... }`) that calls your namespace tool and uses `SpreadsheetApp.getActive().toast()` or `ui.alert()` for feedback. Then register this function in `Config.js` MENU_CONFIG.
 
 ## 🎨 UI/UX Guidelines
 - **Typography**: Use the **Inter** font (Google Fonts import).

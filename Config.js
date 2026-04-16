@@ -30,23 +30,19 @@ const APP_CONFIG = {
 
   /**
    * Menu structure configuration.
-   */
-  /**
-   * Menu structure configuration.
    * Each object in this array represents a separate top-level custom menu in Google Sheets.
    */
   MENU_CONFIG: [
     {
       title: '🧰 Office Tools',
       items: [
-        { label: '🚀 Open Sidebar', functionName: 'showSidebar', roles: ['admin', 'finance', 'hr', 'default'] },
-        { label: '🗑️ Transaction Remover', functionName: 'promptForTransactionRemoval', roles: ['admin', 'finance'] }
+        { label: '🚀 Open Sidebar', functionName: 'showSidebar', roles: ['admin', 'finance', 'hr', 'default'] }
       ]
     },
     {
       title: '✨ Formatting Tools',
       items: [
-        { label: '📏 Autofit Columns', functionName: 'autofitColumns', roles: ['admin', 'finance', 'default'] }
+        { label: '📏 Autofit Columns', functionName: 'menuAutofitColumns', roles: ['admin', 'finance', 'default'] }
       ]
     }
   ]
